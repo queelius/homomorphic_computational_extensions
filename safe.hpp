@@ -1,19 +1,9 @@
 /**
  * For some type T with a computational basis F,
- * we define a functor Safe<T> with the same
- * computational basis that, by some mechanism,
- * signals underflows and overflows and propogates
- * this information to any future operations.
- * 
- *  (e.g., T would normally overflow
- * or underflow, but not on Safe<T>, and whenever
- * Safe<T> does overflow or underflow, it is able
- * to detect it).
- * 
- * However, Safe<T> is only defined on {+,-}, whereas
- * T is defined on {+,*,-}.
- * Many elementary functions besides addition are not
- * in the computational basis of lg<T>.
+ * we define a functor Safe<T> with a computational
+ * basis that is some subset of F that, by some
+ * mechanism, signals underflows and overflows and
+ * propogates this information to any future operations.
  * 
  * Assuming
  *     f : X -> Y
@@ -61,10 +51,9 @@ struct safe
 };
 
 /**
- * Safe models a type that self-detects overflow possibilities.
+ * Safe models a type that self-detects underflow or overflow possibilities.
  * In some cases, it may just know that it's possible, in other
- * cases it may detect exactly when. Depends on the nature of the types
- * involved and the functions being called.
+ * cases it may detect exactly when.
  */
 template <template <typename> typename Safe, class X, class Y>
 safe<Safe<Y>> fmap(function<Y(X)> f, safe<Safe<X>> x) 

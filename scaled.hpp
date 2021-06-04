@@ -10,10 +10,14 @@
  * and
  *     H := T(x * D/N)
  * that allow converting between these two groups.
- * Thus, * : T -> T and / : T -> T must be
- * implemented with the usual meaning. Note that
+ * Thus, * : (T,T) -> T and / : (T,T) -> T must be
+ * implemented with the usual meaning.
+ * 
+ * Note that, depending on how N and D are defined,
+ * the values of scaled<T,N,D> are not the same as T.
+ * If 
  * H is a *partial* function, since some scaled
- * values will necessarily be outside the range.
+ * values will necessarily be outside the range of T.
  * 
  * scaled<T,N,D> has the range
  * [-a*M,a*M], where M := numeric_limits<T>::max()

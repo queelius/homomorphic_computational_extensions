@@ -32,31 +32,44 @@
  *         a will_overflow : lg<T> -> bool predicate
  *         to determine this before the conversion.         
  * 
- * is closed under addition, but the way we
- * store the type is not; instead, we convert the sum to a sum expression,
- *     + : lg<T> -> lg<T> -> sum_expr<lg<T>>.
- * The reason we do not directly convert it to, say, T, 
+ * Additional comments
+ * -------------------
+ * (1) Operations like + : (lg<T>,lg<T>) -> lg<T> are not in the computational
+ * basis of lg<T>. However, expression templates could efficiently model these
+ * operations, e.g.,
+ *     + : (L,R) -> sum_expr<L,R>.
+ * When we convert an expression template, which may be deeply nested,
+ * to lg<T> or T, there are many opportunities to do this conversion without
+ * loss, or at least with less loss, e.g.,
+ *     (lg<T>(x) + lg<T>(x)) + lg<T>(x) = lg<T>(3)*lg<T>(x).
  * 
- * Note: an interesting underlying type T is one that accumulates
+ * An interesting underlying type T is one that accumulates
  * very little rounding error on addition, e.g., a type T that
- * implements + : T -> T -> T using the Kahan summation algorithm
- * such that after products of the form
- *     x1 * x2 * ... * xn,
- * which is transformed to
- *     log x1 + log x2 + ... + log xn,
- * has very little rounding error.
+ * implements + : (T,T) -> T using the Kahan summation algorithm
+ * such that products of the form
+ *     lg<T>(x1) * ... * lg<T>(xn),
+ * which are transformed to
+ *     lg<T>(log(x1) + ... + lg<T>(log(xn)),
+ * have very little error.
  */
 
 #pragma once
 
 #include <cmath>
-#include "safe.hpp"
 
 using std::exp;
 using std::log;
 using std::sqrt;
 using std::numeric_limits;
 
+/**
+ * Models a computational extension using the fact
+ *     exp(log(a*b))==exp(log(a)+log(b)).
+ * 
+ * It has a range of values that is a subset of
+ *     (0,e^m]
+ * where m := numeric_limits<T>::maximum().
+ */
 template <typename T>
 struct lg
 {
@@ -67,8 +80,8 @@ struct lg
 
     lg(lg const &) = default;
 
-    // by default, construct a value equal to 1,
-    // i.e., exp(0) = 1.
+    // by default, constructs a value that is the multiplicative identity
+    // (i.e., exp(0) = 1).
     lg() : k(T(0)) {}
 
     lg(T x) : k(log(x)) { assert(0 < x); };
@@ -78,7 +91,7 @@ struct lg
 };
 
 template <typename T>
-struct numeric_limits<lg<T>>
+struct ::std::numeric_limits<lg<T>>
 {
     static constexpr auto max() { return lg<T>{number_limits<T>::max()}; }
     static constexpr auto min() { return lg<T>{number_limits<T>::min()}; }
@@ -135,24 +148,22 @@ auto gamma(lg<T> const & x)
 }
 
 /**
- * Logarithms are extremely efficient;
- * its the time complexity of the copy constructor
- * for T, which is generally O(1).
- * 
  * log : lg<T> -> lg<T>
+ * 
+ * Logarithms are O(1) to compute in lg<T>.
  */
 template <typename T>
 auto log(lg<T> const & x) { return x.log(); }
 
 /**
- * log to some base b, i.e., log(x,b) solves y for b^y = x.
+ * log : (lg<T>, T) -> lg<T>
  * 
- * log : lg<T> -> T -> lg<T>
+ * log to some base b, i.e., log(x,b) solves y for b^y = x.
  */
-template <typename T>
-auto log(lg<T> const & x, T const & b)
+template <typename T, typename U>
+auto log(lg<T> const & x, U const & b)
 {
-    return lg<T>{x.k / log(b)};
+    return lg<T>{x.k / (T)log(b)};
 }
 
 template <typename T>
@@ -207,7 +218,7 @@ auto fac(int n)
  * The exponential function
  *     exp : lg<T> -> lg<T>
  * may cause an overflow, just as 
- *     * : T -> T -> T
+ *     operator * : (T,T) -> T
  * may cause overflow or underflow on
  * the underlying type T.
  * 
@@ -270,7 +281,7 @@ auto exp(lg<T> const & x) { return lg<T>{(T)x}; }
  * e.g., lifting
  *     f : T -> T
  * to
- *     f : safe<Safe<T>> -> safe<<Safe<T>>.
+ *     f : safe<lg<T>> -> safe<lg<T>>.
  * 
  * lg<T> models the concept of Safe<T>, so any operation
  * on T may be lifted to lg<T>. In full generality,
@@ -279,38 +290,4 @@ auto exp(lg<T> const & x) { return lg<T>{(T)x}; }
  *     (X, +, *, -, X(0)),
  * as required by lg<X>, then they should also work.
  */
-
-
-
-
-
-struct log_table
-{
-    static constexpr int pre_calc[]
-    {
-        8, 7, 6, 6, 5, 5, 5, 5,
-        4, 4, 4, 4, 4, 4, 4, 4,
-        3, 3, 3, 3, 3, 3, 3, 3,
-        3, 3, 3, 3, 3, 3, 3, 3,
-        2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2,
-        2, 2, 2, 2, 2, 2, 2, 2,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1,
-        1, 1, 1, 1, 1, 1, 1, 1
-    };
-
-    template <typename T>
-    static int log2(T const & x)
-    {
-        // convert to to byte array, put in vector<char> buf.
-        const int len = buf.size();
-        return len * 8 - pre_calc[buf[len - 1]] - 1;
-    }
 };
