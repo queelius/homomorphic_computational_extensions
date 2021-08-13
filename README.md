@@ -1,3 +1,9 @@
+---
+title: About Front Matter
+example:
+language: yaml
+---
+
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       tex2jax: {
