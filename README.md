@@ -36,8 +36,8 @@ $$
 with homomorphisms $F$ and $G$
 
 $$
-    F : T -> \hat{T}\\
-    G : \hat{T} -> T
+    F : T \mapsto \hat{T}\\
+    G : \hat{T} \mapsto T
 $$
 
 where **if** $F$ and $G$ are inverses, e.g.,
@@ -77,7 +77,7 @@ The fact that a value of type $\hat{T}$ must
 initially be constructed from a value of type
 $T$ means that these constructions are lossless.
 However, since $\hat{T}$ is a group with
-opeations, namely $*$, a value of type
+operations, namely $\*$, a value of type
 $\hat{T}$ may not be a value in $T$. Typically,
 the value $\hat{T}$ would conceptually map to
 would be outside the range of $T$, e.g., either
