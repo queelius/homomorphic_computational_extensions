@@ -12,7 +12,7 @@
 
 We consider homomorphisms which are based on computational concerns which are
 used to transform inefficient or lossy computations over some original
-domain $T$ into a conceptually equivalent group \( \hat{T} \) over a restricted set
+domain $T$ into a conceptually equivalent group $\hat{T}$ over a restricted set
 of operations. If the original problem can be solved using these restricted
 operations, then we may transform $T$ into $\hat{T}$ and efficiently perform the
 computations.
