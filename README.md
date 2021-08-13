@@ -45,7 +45,9 @@ where **if** $F$ and $G$ are inverses, e.g.,
 $$
     F . G = id_{\hat{T}}
 $$
+
 and
+
 $$
     G . F = id_{T},
 $$
@@ -65,7 +67,7 @@ in the following way: if $a < b$ and $a + c$ or $b + c$ is not in the range of
 $T$, then
 
 $$
-\hat{a} + \hat{c} < \hat{b} + \hat{c}.
+    \hat{a} + \hat{c} < \hat{b} + \hat{c}.
 $$
  
 This is usually done by making $F$ a strictly monotonically increasing
