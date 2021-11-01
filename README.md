@@ -1,18 +1,8 @@
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      tex2jax: {
-        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-        inlineMath: [['$','$']]
-      }
-    });
-  </script>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-  
 # Homomorphic computational extensions
 
 We consider homomorphisms which are based on computational concerns which are
 used to transform inefficient or lossy computations over some original
-domain $T$ into a conceptually equivalent group $\hat{T}$ over a restricted set
+domain $`T`$ into a conceptually equivalent group $\hat{T}$ over a restricted set
 of operations. If the original problem can be solved using these restricted
 operations, then we may transform $T$ into $\hat{T}$ and efficiently perform the
 computations.
