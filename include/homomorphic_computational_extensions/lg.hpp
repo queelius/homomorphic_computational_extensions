@@ -51,6 +51,34 @@
  * which are transformed to
  *     lg<T>(log(x1) + ... + lg<T>(log(xn)),
  * have very little error.
+ *
+ * Example uses:
+ * 
+ * Suppose we wish to compute the likelihood of some
+ * sample under some probability model with parametric
+ * pdf
+ *     p : X -> T
+ * where T models some real number type capable
+ * of representing the values in the set [0,1].
+ * 
+ * We store most of our numberical data as values
+ * of type double, but suspect that the likelihood,
+ * as a product of p, will be too small to represent
+ * as a double (underflow).
+ * 
+ * We decide to parameterize p as
+ *     p<lg<T>>
+ * so that, underneath the hood, multiplications
+ * are converted into additions and the numbers
+ * are internally represented as their respective
+ * exponents.
+ * 
+ * The result of the likelihood computation is
+ * a value of type lg<T>. We can perform many
+ * operations on this result, including comparisons,
+ * with the exception of addition and subtraction,
+ * which is generally not needed in such cases
+ * anyway.
  */
 
 #pragma once
