@@ -1,6 +1,6 @@
 /**
  * Given that type T is a group, denoted by
- *     G = (T,+,-,T(0))
+ *     G = (T,+,*,T(0))
  * we define a related abelian group, denoted by
  *     H = (lg<T>, *, ^(-1), lg<T>(T(0))).
  * 
@@ -51,11 +51,42 @@
  * which are transformed to
  *     lg<T>(log(x1) + ... + lg<T>(log(xn)),
  * have very little error.
+ * 
+ * 
+ * Generic programming
+ * -------------------
+ * 
+ * Any type T that models a ring (
+ *     T,
+ *     +,
+ *     *,
+ *     -,                       inverse additive operation, i.e., (-a) + a = T()
+ *     /,                       inverse multiplicative operation, i.e., a / a = T(1)
+ *     T()                      additive identity
+ *     T(1)                     multiplicative identity
+ * )
+ * along with
+ *     log : T -> T
+ *     exp : T -> T             not strictly necessary if converting back not required
+ * may be lifted to a group (
+ *     lg<T>,
+ *     *,
+ *     /,                       lg<T>(a) / lg<T>(a) = lg<T>()
+ *     lg<T>()                  group identity
+ * )
+ * 
+ * Additional operations may also be supported by T to extend the computational
+ * basis of lg<T>.
+ * 
+ * An obvious type for T is a floating point primitive, like double. However,
+ * T may also be a more exocit type, like a symmetric invertible matrix?
+ *     
  */
 
 #pragma once
 
 #include <cmath>
+#include <limits>
 
 using std::exp;
 using std::log;
@@ -113,7 +144,7 @@ template <typename T>
 auto operator*(lg<T> const & x, lg<T> const & y) { return lg<T>{x.k + y.k}; }
 
 template <typename T>
-auto operator/(lg<T> const & x, lg<T> const & y) { return lg<T>{x.k - y.k}; }
+auto operator/(lg<T> const & x, lg<T> const & y) { return lg<T>{x.k + (-y.k)}; }
 
 template <typename T>
 auto operator<(lg<T> const & x, lg<T> const & y) { return x.k < y.k; }
@@ -142,9 +173,11 @@ auto operator>=(lg<T> const & x, lg<T> const & y) { return x.k >= y.k; }
 template <typename T>
 auto gamma(lg<T> const & x)
 {
+    using std::log;
+    using std::sqrt;
     static const q = log(sqrt((T)2*M_PI));
     const auto y = (T)x;
-    return lg<T>{q + log(sqrt(y)) + y * (T)(log(x)) - y};
+    return lg<T>{q + log(sqrt(y)) + y * (T)(log(x)) + (-y)};
 }
 
 /**
@@ -163,6 +196,7 @@ auto log(lg<T> const & x) { return x.log(); }
 template <typename T, typename U>
 auto log(lg<T> const & x, U const & b)
 {
+    using std::log;
     return lg<T>{x.k / (T)log(b)};
 }
 
@@ -173,10 +207,10 @@ auto pow(lg<T> const & x, T const & e)
 }
 
 template <typename T>
-auto sqrt(lg<T> const & x) { return lg<T>{T(0.5)*x.k}; }
+auto sqrt(lg<T> const & x) { return pow(x, T(0.5)); }
 
 template <typename T>
-auto root(lg<T> const & x, T const & r) { return pow(x, T(1) / r); }
+auto nth_root(lg<T> const & x, T const & r) { return pow(x, T(1) / r); }
 
 template <typename T>
 constexpr auto sign(lg<T> const &) { return 1; }
@@ -209,6 +243,8 @@ template <typename T>
 auto fac(int n)
 {
     T s = T(0);
+    // if T is a floating point type, then adding from smallest to largest
+    // reduces round-off error.
     for (int i = 2; i <= n; ++i)
         s += log(i);
     return lg<T>{s};
