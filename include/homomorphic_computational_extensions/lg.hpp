@@ -51,8 +51,6 @@
  * which are transformed to
  *     lg<T>(log(x1) + ... + lg<T>(log(xn)),
  * have very little error.
-<<<<<<< HEAD
- * 
  * 
  * Generic programming
  * -------------------
@@ -82,8 +80,6 @@
  * An obvious type for T is a floating point primitive, like double. However,
  * T may also be a more exocit type, like a symmetric invertible matrix?
  *     
-=======
- *
  * Example uses:
  * 
  * Suppose we wish to compute the likelihood of some
@@ -111,7 +107,6 @@
  * with the exception of addition and subtraction,
  * which is generally not needed in such cases
  * anyway.
->>>>>>> 7d999ab6902096afe81490ee3cfc04f6bd39598a
  */
 
 #pragma once
